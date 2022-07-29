@@ -1,7 +1,3 @@
-
-
-
-
 pub fn convert_line(cam: &[f64; 2], cutoff:&f64, line: &[[i32;2];2]) -> [[f64;2];2]{
 
     let line0 = triangulate_point(&cam, &cutoff, &line[0]);
