@@ -2,7 +2,7 @@
 
 
 
-pub fn convert_line(cam: &[i32; 2], cutoff:&f64, line: &[[i32;2];2]) -> [[f64;2];2]{
+pub fn convert_line(cam: &[f64; 2], cutoff:&f64, line: &[[i32;2];2]) -> [[f64;2];2]{
 
     let line0 = triangulate_point(&cam, &cutoff, &line[0]);
     let line1 = triangulate_point(&cam, &cutoff, &line[1]);
@@ -11,22 +11,22 @@ pub fn convert_line(cam: &[i32; 2], cutoff:&f64, line: &[[i32;2];2]) -> [[f64;2]
     return parsed_line;
 }
 
-pub fn triangulate_point(cam:&[i32; 2], cutoff:&f64, point:&[i32;2]) -> [f64; 2]{
+pub fn triangulate_point(cam:&[f64; 2], cutoff:&f64, point:&[i32;2]) -> [f64; 2]{
     let mut _adj: f64;
     let mut _opp: f64;
 
     //parse adj so it does not give a negative value
-    if cam[0] > point[0]{
-        _adj = (cam[0] - point[0]) as f64;
+    if cam[0] > point[0] as f64 {
+        _adj = (cam[0] - point[0] as f64) ;
     } else {
-        _adj = (point[0] - cam[0]) as f64;
+        _adj = (point[0] as f64 - cam[0]);
     }
 
     //parse hyp
-    if cam[1] > point[1]{
-        _opp = (cam[1] - point[1]) as f64;
+    if cam[1] > point[1] as f64{
+        _opp = (cam[1] - point[1] as f64);
     } else {
-        _opp = (point[1] - cam[1]) as f64;
+        _opp = (point[1] as f64 - cam[1]);
     }
 
     //find angle
