@@ -2,16 +2,16 @@
 
 
 
-pub fn convert_line(cam: &[i32; 2], line: &[[i32;2];2]) -> [[f64;2];2]{
+pub fn convert_line(cam: &[i32; 2], cutoff:&f64, line: &[[i32;2];2]) -> [[f64;2];2]{
 
-    let line0 = triangulate_point(&cam, &line[0]);
-    let line1 = triangulate_point(&cam, &line[1]);
+    let line0 = triangulate_point(&cam, &cutoff, &line[0]);
+    let line1 = triangulate_point(&cam, &cutoff, &line[1]);
 
     let parsed_line: [[f64;2];2] = [line0, line1];
     return parsed_line;
 }
 
-pub fn triangulate_point(cam:&[i32; 2], point:&[i32;2]) -> [f64; 2]{
+pub fn triangulate_point(cam:&[i32; 2], cutoff:&f64, point:&[i32;2]) -> [f64; 2]{
     let mut _adj: f64;
     let mut _opp: f64;
 
@@ -38,6 +38,15 @@ pub fn triangulate_point(cam:&[i32; 2], point:&[i32;2]) -> [f64; 2]{
     let c = (a_sqr + b_sqr) as f64;
     let hyp = f64::sqrt(c);
 
+    let mut dist = 0.0;
+
+    //make real value or cut off
+    if &hyp > cutoff{
+        dist = 0.0;
+    } else {
+        dist = (cutoff - hyp)/2.0;
+    }
+
     //return both
-    return [angle.to_degrees(), hyp];
+    return [angle.to_degrees(), dist];
 }
