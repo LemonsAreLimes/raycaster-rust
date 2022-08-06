@@ -17,9 +17,9 @@ use piston::{Button, ButtonEvent, PressEvent, ReleaseEvent};
 use piston::Button::Keyboard;
 use piston::ButtonState::Press;
 use piston::Key::{W,A,S,D,P,O,I,Q,E};
+use crate::pre_renders::reset_angle;
 
 mod pre_renders;
-
 
 
 fn main() {
@@ -68,8 +68,8 @@ fn main() {
             else if args == Keyboard(S) {pressing = [0,0]}      //back
             else if args == Keyboard(A) {pressing = [1,1]}      //left
             else if args == Keyboard(D) {pressing = [1,0]}      //right
-            else if args == Keyboard(Q) {pressing = [5,0]}
-            else if args == Keyboard(E) {pressing = [5,1]}
+            else if args == Keyboard(Q) {pressing = [5,0]}      //rot -
+            else if args == Keyboard(E) {pressing = [5,1]}      //rot +
             else if args == Keyboard(P) {mode = "point"}
             else if args == Keyboard(O) {mode = "object"}
             else if args == Keyboard(I) {mode = "top-down"}
@@ -88,7 +88,6 @@ fn main() {
 
             for key in key_list {
                 if args == key {pressing = [9,9]}
-
             }
 
             let is_key = args == Keyboard(W) || args == Keyboard(S) || args == Keyboard(A) || args == Keyboard(D);
@@ -96,15 +95,18 @@ fn main() {
         }
 
         if pressing != [9,9] { //yes ik theres better ways to do this but whatever
-            let speed = 0.25;
-            let rot_speed = 15.0;
+            let rot_speed = 0.25;
 
-            if      pressing == [0,1] {pos[0] += speed}  //movement
-            else if pressing == [0,0] {pos[0] -= speed}
-            else if pressing == [1,1] {pos[1] += speed}
-            else if pressing == [1,0] {pos[1] -= speed}
+            if pressing[0] != 5 && pressing[0] != 9 {
+                pos = pre_renders::movement(&pressing, pos, rot);
+            }
+
             else if pressing == [5,0] {rot -= rot_speed} //rotation
             else if pressing == [5,1] {rot += rot_speed}
+
+            //rotation resetting
+            rot = reset_angle(rot);
+
         }
 
         //render screen on evrey tick??? event??? idk
@@ -133,6 +135,7 @@ impl App {
 
             //render with selected mode
             if mode == "point" {
+
                 let points = pre_renders::prerender_points(args.window_size[1] / 2.0, pos, rot, &map);
 
                 //render shapes from get_shapes
@@ -145,6 +148,7 @@ impl App {
             }
 
             else if mode == "object" {
+
                 let poly_data = pre_renders::prerender_objects(args.window_size[1] / 2.0, pos, rot, &map);
 
                 for poly in poly_data {
@@ -157,6 +161,15 @@ impl App {
 
                 //draw camera pos
                 rectangle(green, [pos[0], pos[1], spot_size, spot_size], ctx.transform, gl);
+
+                //mid -> rot
+                line(blue, 5.0, [0.5, 0.5, 0.5, 100.0], ctx.transform.trans(pos[0], pos[1]).rot_deg(rot), gl);
+
+                //angle ends
+                line(red, 5.0, [0.5, 0.5, 0.5, 100.0], ctx.transform.trans(pos[0], pos[1]).rot_deg(rot+45.0), gl);
+                line(red, 5.0, [0.5, 0.5, 0.5, 100.0], ctx.transform.trans(pos[0], pos[1]).rot_deg(rot-45.0), gl);
+
+                //startx, starty, endx, endy
 
                 //draw points in non-camera view
                 for l in map {
